@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:task_helper/app/images_path.dart';
 import 'package:task_helper/core/services/api_services.dart';
+import 'package:task_helper/core/services/auth_controller.dart';
 import 'package:task_helper/core/utils/urls/api_urls.dart';
+import 'package:task_helper/features/auth/models/user_model.dart';
 import 'package:task_helper/features/home/controller/all_task_controller.dart';
 import 'package:task_helper/features/home/model/task_model.dart';
 import 'package:task_helper/features/home/presentation/screens/widgets/task_card.dart';
@@ -52,14 +54,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: AssetImage(ImagesPath.demoProfileImg),
+                      backgroundImage: (AuthController.userModel?.image != null &&
+                          AuthController.userModel!.image.isNotEmpty)
+                          ? NetworkImage(AuthController.userModel!.image)
+                          : const AssetImage(ImagesPath.userIcon) as ImageProvider,
                     ),
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello Mojahid',
+                         "${AuthController.userModel!.firstName} ${AuthController.userModel!.lastName}" ,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontSize: 14,
                             color: Colors.black,
@@ -109,7 +114,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       return TaskCard(
                         onTap: () {
-                          Navigator.pushNamed(context, TaskDetailsScreen.name);
+                          Navigator.pushNamed(context, TaskDetailsScreen.name,
+                          arguments: {
+                            "title" : task.title,
+                            "description" : task.description,
+                          });
                         },
                         title: "Task $index: ${task.title}",
                         description: task.description,

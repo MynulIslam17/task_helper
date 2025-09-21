@@ -73,7 +73,11 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const EditTaskScreen());
 
       case TaskDetailsScreen.name:
-        return MaterialPageRoute(builder: (_) => const TaskDetailsScreen());
+        final arg=settings.arguments as Map<String,dynamic>;
+        return MaterialPageRoute(builder: (_) =>  TaskDetailsScreen(
+          title: arg["title"],
+          description: arg["description"],
+        ));
 
       case ProfileScreen.name:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());

@@ -3,7 +3,12 @@ import 'package:task_helper/app/app_colors.dart';
 import 'package:task_helper/features/task/presentation/screens/edit_task_screen.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
-  const TaskDetailsScreen({super.key});
+
+  final String title;
+  final String description;
+  const TaskDetailsScreen({super.key, required this.title, required this.description});
+
+
 
   static const String name = "task_details_screen";
 
@@ -54,7 +59,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         _buildDetailItem(
                           icon: Icons.assignment_outlined,
                           title: 'Task Title',
-                          content: 'Task title will be here',
+                          content:title,
                         ),
                         const SizedBox(height: 24),
 
@@ -62,8 +67,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         _buildDetailItem(
                           icon: Icons.notes,
                           title: 'Task Description',
-                          content:
-                              'anding page. Include logo, navigation menu, search bar, and a primary call-to-action button. Ensure mobile responsiveness and use the brand green',
+                          content:description
                         ),
 
                         const SizedBox(height: 24),

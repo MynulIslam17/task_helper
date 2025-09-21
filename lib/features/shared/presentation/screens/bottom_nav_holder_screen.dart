@@ -45,8 +45,15 @@ class _BottomNavHolderScreenState extends State<BottomNavHolderScreen> {
             key: _homeNavigatorKey,
             onGenerateRoute: (settings) {
               if (settings.name == TaskDetailsScreen.name) {
+
+                final arg=settings.arguments as Map<String,dynamic>;
                 return MaterialPageRoute(
-                  builder: (_) => const TaskDetailsScreen(),
+                  builder: (_) =>  TaskDetailsScreen(
+
+                    title: arg["title"],
+                    description: arg["description"],
+
+                  ),
                 );
               } else if (settings.name == EditTaskScreen.name) {
                 return MaterialPageRoute(

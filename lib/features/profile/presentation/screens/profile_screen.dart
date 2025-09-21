@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_helper/app/app_colors.dart';
 import 'package:task_helper/app/images_path.dart';
+import 'package:task_helper/core/services/auth_controller.dart';
+import 'package:task_helper/features/auth/presentation/screens/login_screen.dart';
 import 'package:task_helper/features/profile/presentation/screens/help_and_support_screen.dart';
 import 'package:task_helper/features/profile/presentation/screens/my_profile.dart';
 import 'package:task_helper/features/profile/presentation/screens/privacy_policy_screen.dart';
@@ -115,7 +117,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           builder: (BuildContext context) {
                             return LogoutDialog(
                               text: "Are you sure you want to logOut?",
-                              onTap: (){
+                              onTap: ()async{
+
+                                await AuthController.clearData();
+                                Navigator.pushNamedAndRemoveUntil(context, LoginScreen.name, (predicate)=>false);
 
                               }
                             );
