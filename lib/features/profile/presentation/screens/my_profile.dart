@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_helper/app/images_path.dart';
+import 'package:task_helper/core/services/auth_controller.dart';
+import 'package:task_helper/features/auth/models/user_model.dart';
 import 'package:task_helper/features/profile/presentation/screens/edit_profile.dart';
 
 import '../../../../app/app_colors.dart';
@@ -13,8 +15,14 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
+
+
+
+
   @override
   Widget build(BuildContext context) {
+
+     UserModel model=AuthController.userModel!;
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
@@ -41,7 +49,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         ),
         leadingWidth: 70,
         title: Text(
-          'My Profile',
+         "My profile",
           style: TextTheme.of(
             context,
           ).titleMedium?.copyWith(fontSize: 17, color: AppColors.btnColors),
@@ -87,8 +95,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
               const SizedBox(height: 16),
               // User Name
-              const Text(
-                'Mojahid',
+                Text(
+               model.firstName,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -104,17 +112,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   children: [
                     _buildInfoCard(
                       icon: Icons.person_outline,
-                      label: 'Mojahid Islam',
+                      label: "${model.firstName} ${model.lastName}",
                     ),
                     const SizedBox(height: 16),
                     _buildInfoCard(
                       icon: Icons.email_outlined,
-                      label: 'samualtman@gmail.com',
+                      label: model.email,
                     ),
                     const SizedBox(height: 16),
                     _buildInfoCard(
                       icon: Icons.location_on_outlined,
-                      label: '1234 Elm Street, Springfield, IL',
+                      label: model.address,
                     ),
                   ],
                 ),

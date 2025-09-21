@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_helper/app/images_path.dart';
+import 'package:task_helper/core/services/auth_controller.dart';
+import 'package:task_helper/features/auth/models/user_model.dart';
 import 'package:task_helper/features/auth/presentation/screens/widgets/text_field_with_shadow.dart';
 import 'package:task_helper/features/profile/presentation/widgets/custome_app_bar.dart';
 import '../../../../app/app_colors.dart';
@@ -21,9 +23,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: 'Mojahid Islam');
-    _emailController = TextEditingController(text: 'samualtman@gmail.com');
-    _addressController = TextEditingController(text: '1234 Elm Street, Springfield, IL');
+
+        UserModel model =AuthController.userModel!;
+    _nameController = TextEditingController(text:"${model.firstName} ${model.lastName}");
+    _emailController = TextEditingController(text: model.email);
+    _addressController = TextEditingController(text: model.address);
   }
 
   @override
