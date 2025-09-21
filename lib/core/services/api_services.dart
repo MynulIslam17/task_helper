@@ -186,6 +186,48 @@ class NetworkCaller {
 
 
 
+  /// DELETE request
+  static Future<NetworkResponse> deleteRequest(String url) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": "Bearer ${AuthController.Token ?? ""}",
+        "Content-Type": "application/json",
+      };
+
+      _logRequest(url, null, headers);
+
+      final uri = Uri.parse(url);
+      final response = await http.delete(uri, headers: headers);
+
+      _logResponse(url, response);
+
+      if (response.statusCode == 200) {
+        final decodedJson = jsonDecode(response.body);
+        return NetworkResponse(
+          statusCode: response.statusCode,
+          success: true,
+          body: decodedJson,
+        );
+      } else {
+        final decodedJson = jsonDecode(response.body);
+        return NetworkResponse(
+          statusCode: response.statusCode,
+          success: false,
+          errorMsg: decodedJson["message"] ?? errorMessage,
+        );
+      }
+    } catch (e) {
+      return NetworkResponse(
+        statusCode: -1,
+        success: false,
+        errorMsg: e.toString(),
+      );
+    }
+  }
+
+
+
+
 
 
 

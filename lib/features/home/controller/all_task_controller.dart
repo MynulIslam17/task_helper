@@ -62,4 +62,42 @@ class AllTaskController extends GetxController {
     update();
     return success;
   }
+
+
+
+  /// delete task
+
+
+  Future<bool> deleteTask(String id) async{
+    bool success = false;
+
+    NetworkResponse response =await NetworkCaller.deleteRequest(ApiUrls.deleteTaskUrl(id));
+
+    if(response.success){
+
+      success=true;
+
+    }else{
+
+      _errorMsg=response.body!["message"] ?? " something wrong";
+
+    }
+
+
+    update();
+
+
+
+
+    return success;
+
+
+
+  }
+
+
+
+
+
+
 }

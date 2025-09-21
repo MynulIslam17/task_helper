@@ -75,9 +75,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               ),
               const SizedBox(height: 24),
 
-              ElevatedButton(onPressed: () {
-
-              },
+              ElevatedButton(onPressed:_ediTask,
 
                   child: Text("Update Task")
               ),
@@ -98,5 +96,17 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     _descriptionEditController.dispose();
     super.dispose();
   }
+
+
+
+  Future<void> _ediTask() async{
+
+
+
+
+  }
+
+
+
 
 }

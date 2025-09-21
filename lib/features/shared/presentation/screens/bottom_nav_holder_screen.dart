@@ -49,9 +49,26 @@ class _BottomNavHolderScreenState extends State<BottomNavHolderScreen> {
                 final arg=settings.arguments as Map<String,dynamic>;
                 return MaterialPageRoute(
                   builder: (_) =>  TaskDetailsScreen(
-
+                      id : arg["id"],
                     title: arg["title"],
                     description: arg["description"],
+
+                      onTaskDeleted: (message) async {
+                        // Show success message on home tab
+                        ScaffoldMessenger.of(_homeNavigatorKey.currentContext!)
+                            .showSnackBar(
+                          SnackBar(content: Text(message)),
+                        );
+
+                        // Refresh tasks
+                        final allTaskController = Get.find<AllTaskController>();
+                        await allTaskController.retrieveTask();
+
+                        // Pop back to home screen
+                        _homeNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+
+
+                      }
 
                   ),
                 );

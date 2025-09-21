@@ -117,7 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.pushNamed(context, TaskDetailsScreen.name,
                           arguments: {
                             "title" : task.title,
+                            "id" : task.id,
                             "description" : task.description,
+
                           });
                         },
                         title: "Task $index: ${task.title}",

@@ -1,16 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_helper/app/app_colors.dart';
+import 'package:task_helper/features/home/controller/all_task_controller.dart';
+import 'package:task_helper/features/profile/presentation/widgets/dialog.dart';
 import 'package:task_helper/features/task/presentation/screens/edit_task_screen.dart';
 
-class TaskDetailsScreen extends StatelessWidget {
+import '../../../../app/images_path.dart';
+import '../../../shared/widgets/spiner.dart';
+
+class TaskDetailsScreen extends StatefulWidget {
+
+  final void Function(String message)? onTaskDeleted;
 
   final String title;
+  final String id;
   final String description;
-  const TaskDetailsScreen({super.key, required this.title, required this.description});
+  const TaskDetailsScreen({super.key, required this.title, required this.description, required this.id, this.onTaskDeleted, });
 
 
 
   static const String name = "task_details_screen";
+
+  @override
+  State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
+}
+
+class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
+
+  final  taskController=Get.find<AllTaskController>();
+
+
+  ///  pragress spin indicator
+  void _showLoader() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black45,
+      useRootNavigator: true,
+      builder: (_) => Center(
+        child: SpinningLoader(assetPath: ImagesPath.spiner_img),
+      ),
+    );
+  }
+
+
+  void _hideLoader() {
+    if (Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +102,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         _buildDetailItem(
                           icon: Icons.assignment_outlined,
                           title: 'Task Title',
-                          content:title,
+                          content:widget.title,
                         ),
                         const SizedBox(height: 24),
 
@@ -67,7 +110,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         _buildDetailItem(
                           icon: Icons.notes,
                           title: 'Task Description',
-                          content:description
+                          content:widget.description
                         ),
 
                         const SizedBox(height: 24),
@@ -75,12 +118,33 @@ class TaskDetailsScreen extends StatelessWidget {
                         /// button for edit and delete
                         Row(
                           children: [
-                            /// edit btn
+                            /// delete btn
                             Expanded(child: _customButton(
 
                               icon: Icons.delete_outline,
                               color: Colors.redAccent,
                               onTap: () {
+
+                                showDialog(context: context, builder: (context){
+
+                                  return LogoutDialog(text: "Are you sure you want to delete the task ? ",
+                                      onTap: ()async{
+
+                                        Navigator.pop(context);
+                                        _showLoader();
+
+                                         /// Api operation called
+                                         await  _deleteTask();
+
+                                        _hideLoader(); // hide loading spinner
+
+
+                                      }
+                                      );
+
+                                });
+
+
 
                               },
                               text: 'Delete Task',
@@ -92,14 +156,14 @@ class TaskDetailsScreen extends StatelessWidget {
                             )),
                             const SizedBox(width: 16),
 
-                            /// delete btn
+                            /// edit btn
                             Expanded(
                               child: _customButton(
 
                                 icon: Icons.edit_outlined,
                                 color: const Color(0xff22C55E),
                                 onTap: () {
-                                 
+
                                   Navigator.pushNamed(context, EditTaskScreen.name);
                                 },
                                 text: 'Edit Task',
@@ -185,4 +249,31 @@ class TaskDetailsScreen extends StatelessWidget {
       ],
     );
   }
+
+
+  /// delete task
+
+Future<void> _deleteTask() async{
+
+
+
+  bool success = await taskController.deleteTask(widget.id);
+
+  if (!mounted) return;
+
+  if (success) {
+    // Call the callback to update home and show success
+    if (widget.onTaskDeleted != null) {
+      widget.onTaskDeleted!("Task deleted successfully!");
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(taskController.errorMessage!)),
+    );
+  }
+
+
+}
+
+
 }

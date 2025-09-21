@@ -76,6 +76,7 @@ class AppRoutes {
         final arg=settings.arguments as Map<String,dynamic>;
         return MaterialPageRoute(builder: (_) =>  TaskDetailsScreen(
           title: arg["title"],
+          id: arg["id"],
           description: arg["description"],
         ));
 
