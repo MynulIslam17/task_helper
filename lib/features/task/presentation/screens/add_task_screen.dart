@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:task_helper/core/services/api_services.dart';
+import 'package:task_helper/core/utils/urls/api_urls.dart';
 import 'package:task_helper/features/auth/presentation/screens/widgets/text_field_with_shadow.dart';
+import 'package:task_helper/features/home/controller/all_task_controller.dart';
+import 'package:task_helper/features/profile/presentation/widgets/dialog.dart';
+import 'package:task_helper/features/profile/presentation/widgets/success_dialog.dart';
+
+import '../../../../app/images_path.dart';
+import '../../../shared/widgets/spiner.dart';
 
 class AddTaskScreen extends StatefulWidget {
-  const AddTaskScreen({super.key});
+
+  final void Function(String message)? onTaskAdded;
+  const AddTaskScreen({super.key, this.onTaskAdded});
+
   static const String name = "add_task_screen";
 
   @override
@@ -10,8 +23,36 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+
+  final allTaskController=Get.find<AllTaskController>();
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+
+
+
+
+  bool _isLoading = false;
+
+  ///  pragress spin indicator
+  void _showLoader() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black45,
+      useRootNavigator: true,
+      builder: (_) => Center(
+        child: SpinningLoader(assetPath: ImagesPath.spiner_img),
+      ),
+    );
+  }
+
+
+  void _hideLoader() {
+    if (Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +112,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 24),
 
-              ElevatedButton(onPressed: () {
-
-              },
+              ElevatedButton(onPressed:_addTask,
 
                   child: Text("Save Task")
               ),
@@ -86,11 +125,74 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 
+
+  /// add task
+
+  void _addTask() async{
+
+
+    if(_titleController.text.isEmpty || _descriptionController.text.isEmpty  ){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("field cant be empty")));
+      return;
+    }
+
+/// show a dialog first
+    showDialog(
+        context: context,
+        builder: (context){
+          return LogoutDialog(text: "Are you sure you want to add this task?",
+            onTap: () async{
+
+            Navigator.pop(context);
+            _showLoader();
+
+            Map<String, dynamic> body = {
+              "title": _titleController.text,
+              "description": _descriptionController.text,
+            };
+
+            NetworkResponse response = await NetworkCaller.postRequest(
+              url: ApiUrls.createTaskUrl,
+              body: body,
+            );
+
+            _hideLoader(); // hide loading spinner
+
+            if (!mounted) return;
+
+            if (response.success) {
+              // Call the callback to update home and show success
+              if (widget.onTaskAdded != null) {
+                widget.onTaskAdded!("Task added successfully!");
+              }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(response.body!["error"])),
+              );
+            }
+            
+
+
+           
+
+
+            },
+          );
+        }
+    );
+
+
+
+  }
+
+
+
+
   @override
   void dispose() {
     // TODO: implement dispose
     _titleController.dispose();
-    _descriptionController.clear;
+    _descriptionController.dispose();
     super.dispose();
   }
 }

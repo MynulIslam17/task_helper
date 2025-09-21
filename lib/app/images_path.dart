@@ -13,6 +13,8 @@ class ImagesPath {
   static const String userIcon = "assets/images/user_icon.png";
   static const String demoProfileImg = "assets/images/demo_profile_img.png";
   static const String topWave = "assets/images/top_wave.png";
+  static const String spiner_img = "assets/images/spiner_img.png";
+  static const String logo2_img = "assets/images/logo2_img.png";
 
 
 

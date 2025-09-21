@@ -50,7 +50,12 @@ class SettingsScreen extends StatefulWidget {
 
                        showDialog(context: (context),
                            builder: (context){
-                         return LogoutDialog(text: "Do you wanna delete this account ?");
+                         return LogoutDialog(text: "Do you wanna delete this account ?",
+                         onTap: (){
+
+                         },
+
+                         );
                            });
 
                       }),

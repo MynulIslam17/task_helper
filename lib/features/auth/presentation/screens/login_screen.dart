@@ -1,17 +1,24 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:task_helper/app/app_colors.dart';
+import 'package:task_helper/core/services/api_services.dart';
+import 'package:task_helper/core/services/auth_controller.dart';
+import 'package:task_helper/core/utils/urls/api_urls.dart';
+import 'package:task_helper/features/auth/models/user_model.dart';
 import 'package:task_helper/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:task_helper/features/auth/presentation/screens/widgets/text_field_with_shadow.dart';
 import 'package:task_helper/features/shared/presentation/screens/bottom_nav_holder_screen.dart';
 
+import '../../../../app/images_path.dart';
+import '../../../shared/widgets/spiner.dart';
 import 'widgets/password_field.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.message});
 
   /// string that used for named navigation
   static const  String name="/logIn";
+  final String ? message ;
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -22,6 +29,38 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // show snackbar if message is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.message != null && widget.message!.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(widget.message!)),
+        );
+      }
+    });
+  }
+
+  bool _isLoading = false;
+
+ ///  pragress spin indicator
+  void _showLoader() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black45,
+      builder: (_) => Center(
+        child: SpinningLoader(assetPath: ImagesPath.spiner_img),
+      ),
+    );
+  }
+
+  void _hideLoader() {
+    Navigator.of(context).pop(); // closes dialog
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 /// input validation
-  void _validateAndLogin() {
+  void _validateAndLogin()async {
 
     String email = _emailController.text.trim();
     String password = _passwordController.text;
@@ -225,9 +264,60 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // All validations passed
     print("Email: $email, Password: $password");
-    // Call your login API here
 
-    Navigator.pushReplacementNamed(context, BottomNavHolderScreen.name);
+
+    // Call your login API here
+    /// show loader
+    _showLoader();
+
+    Map<String,dynamic> body={
+      "email" : _emailController.text,
+      "password" : _passwordController.text
+    };
+
+    // simulate API call
+    NetworkResponse response=await NetworkCaller.postRequest(url: ApiUrls.loginUrl,body: body);
+
+    //  hide loader
+    _hideLoader();
+
+     if(!mounted){
+       return;
+     }
+
+    final data=response.body;
+
+    if(response.success){
+
+
+       final data=response.body!["data"];
+       final token=data["token"];
+       final user=data["user"];
+
+     /// pass the userInfo map to the model
+       UserModel model =UserModel.fromJson(user);
+
+      await AuthController.saveDataAndToken(token, model);
+
+
+
+       if(!mounted){
+
+         return;
+       }
+
+      Navigator.pushNamedAndRemoveUntil(context, BottomNavHolderScreen.name, (predicate)=>false);
+
+
+
+
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.errorMsg!)));
+    }
+
+
+
+
 
 
   }

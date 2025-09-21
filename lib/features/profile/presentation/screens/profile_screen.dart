@@ -115,6 +115,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           builder: (BuildContext context) {
                             return LogoutDialog(
                               text: "Are you sure you want to logOut?",
+                              onTap: (){
+
+                              }
                             );
                           },
                         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http show Response;
 import 'package:task_helper/app/app_colors.dart';
 import 'package:task_helper/core/services/api_services.dart';
 import 'package:task_helper/core/utils/urls/api_urls.dart';
@@ -24,8 +25,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       TextEditingController();
 
   bool _agreeToTerms = false;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -297,9 +296,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-
   void _registerUser() async {
-
     // Basic validation
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
@@ -307,16 +304,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty ||
         _addressController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("All fields are required")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("All fields are required")));
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
       return;
     }
 
@@ -337,27 +334,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
     };
 
 
-    NetworkResponse response=await NetworkCaller.postRequest(url: ApiUrls.registerUrl,body: body);
 
-    if(response.success){
-      ///
-    }else{
 
-    }
+     NetworkResponse response = await NetworkCaller.multipartRequest(url: ApiUrls.registerUrl, fields: body);
 
+     if(response.success){
+
+       if(!mounted){
+         return;
+       }
+
+       Navigator.pushNamed(context, VerifyEmail.name,arguments: {
+        "message": response.body!["message"],
+         "email" : _emailController.text
+       }
+       );
+
+     }else{
+       print("error");
+     }
 
 
 
 
 
   }
-
-
-
-
-
-
-
 
   @override
   void dispose() {
@@ -369,7 +370,4 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
-
-
-
 }

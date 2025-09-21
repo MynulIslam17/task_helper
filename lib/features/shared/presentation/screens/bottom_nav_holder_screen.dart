@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_helper/app/app_colors.dart';
 import 'package:task_helper/features/home/presentation/screens/home_screen.dart';
 import 'package:task_helper/features/profile/presentation/screens/change_password_screen.dart';
@@ -13,6 +15,8 @@ import 'package:task_helper/features/task/presentation/screens/add_task_screen.d
 import 'package:task_helper/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:task_helper/features/task/presentation/screens/edit_task_screen.dart';
 import 'package:task_helper/features/task/presentation/screens/task_details_screen.dart';
+
+import '../../../home/controller/all_task_controller.dart';
 
 class BottomNavHolderScreen extends StatefulWidget {
   const BottomNavHolderScreen({super.key});
@@ -57,9 +61,30 @@ class _BottomNavHolderScreenState extends State<BottomNavHolderScreen> {
           // 🔹 Add Task tab navigator (new!)
           Navigator(
             onGenerateRoute: (settings) {
-              return MaterialPageRoute(builder: (_) => const AddTaskScreen());
+              return MaterialPageRoute(
+                builder: (_) => AddTaskScreen(
+                  onTaskAdded: (message) async {
+
+                    // Show SnackBar on home screen
+                    ScaffoldMessenger.of(_homeNavigatorKey.currentContext!).showSnackBar(
+                      SnackBar(content: Text(message)),
+                    );
+
+                    setState(() {
+                      _currentIndex = 0; // switch to Home tab
+                    });
+
+
+                // Trigger task reload
+                    final allTaskController = Get.find<AllTaskController>();
+                    await allTaskController.retrieveTask();
+                    _homeNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+                  },
+                ),
+              );
             },
           ),
+
 
           // Profile tab
         //  const ProfileScreen(),

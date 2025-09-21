@@ -28,6 +28,8 @@ import 'package:task_helper/features/shared/presentation/screens/bottom_nav_hold
 // Splash
 import 'package:task_helper/features/splash/presentation/screens/splash_screen.dart';
 
+import '../features/home/presentation/screens/home_screen.dart';
+
 class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -35,16 +37,28 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
       case LoginScreen.name:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+         final String ? message=settings.arguments as String?;
+        return MaterialPageRoute(builder: (_) => LoginScreen(
+         message: message,
+        ));
 
       case SignUpScreen.name:
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
 
       case VerifyEmail.name:
-        return MaterialPageRoute(builder: (_) => const VerifyEmail());
+        final arg = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) =>
+              VerifyEmail(email: arg["email"],
+                  message: arg["message"]),
+        );
 
       case OtpScreen.name:
-        return MaterialPageRoute(builder: (_) => const OtpScreen());
+
+        final String email=settings.arguments as String;
+        return MaterialPageRoute(builder: (_) =>  OtpScreen(
+          email: email,
+        ));
 
       case ResetPasswordScreen.name:
         return MaterialPageRoute(builder: (_) => const ResetPasswordScreen());
@@ -69,6 +83,8 @@ class AppRoutes {
 
       case EditProfileScreen.name:
         return MaterialPageRoute(builder: (_) => const EditProfileScreen());
+      case HomeScreen.name:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
 
       case SettingsScreen.name:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
@@ -80,16 +96,17 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
 
       case TermsAndConditionScreen.name:
-        return MaterialPageRoute(builder: (_) => const TermsAndConditionScreen());
+        return MaterialPageRoute(
+          builder: (_) => const TermsAndConditionScreen(),
+        );
 
       case HelpAndSupportScreen.name:
         return MaterialPageRoute(builder: (_) => const HelpAndSupportScreen());
 
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Page not found')),
-          ),
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Page not found'))),
         );
     }
   }

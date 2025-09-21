@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_helper/app/bindings/app_bindings.dart';
 import 'package:task_helper/features/auth/presentation/screens/login_screen.dart';
 import 'package:task_helper/features/auth/presentation/screens/otp_screen.dart';
 import 'package:task_helper/features/auth/presentation/screens/sign_up_screen.dart';
@@ -26,8 +28,12 @@ class TaskHelper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+
+
+    return GetMaterialApp(
       initialRoute:  SplashScreen.name,
+
+      initialBinding: AppBinding(),
 
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:task_helper/app/app_colors.dart';
 import 'package:task_helper/app/images_path.dart';
+import 'package:task_helper/core/services/auth_controller.dart';
 import 'package:task_helper/features/auth/presentation/screens/login_screen.dart';
 import 'package:task_helper/features/shared/presentation/screens/bottom_nav_holder_screen.dart';
 
@@ -31,11 +32,21 @@ class _SplashScreenState extends State<SplashScreen> {
       seconds: 3,
     ));
 
+    bool isLogin=await AuthController.isLogedIn();
+
    if(!mounted){
      return;
    }
 
-   Navigator.pushReplacementNamed(context,LoginScreen.name);
+   if(isLogin){
+     Navigator.pushReplacementNamed(context,BottomNavHolderScreen.name);
+
+   }else{
+     Navigator.pushReplacementNamed(context,LoginScreen.name);
+   }
+
+
+
 
 
   }

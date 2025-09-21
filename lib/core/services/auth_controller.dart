@@ -1,31 +1,94 @@
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:flutter/material.dart';
-//
-// class AuthController {
-//   static String? Token; // Stored in memory
-//   static late SharedPreferences _sharedPreferences;
-//
-//   // Initialize SharedPreferences
-//   static Future<void> initialize() async {
-//     _sharedPreferences = await SharedPreferences.getInstance();
-//     Token = _sharedPreferences.getString('user-token');
-//   }
-//
-//   // Save the user token to SharedPreferences and memory
-//   static Future<bool> saveToken(String userToken) async {
-//     _sharedPreferences.setString('user-token', userToken);
-//     Token = userToken;
-//     return true;
-//   }
-//
-//   // Clear all authentication data (token)
-//   static Future<void> clearData() async {
-//     await _sharedPreferences.clear();
-//     Token = null;
-//   }
-//
-//   // Check if the user is currently logged in
-//   static bool isLoggedIn() {
-//     return Token != null;
-//   }
-// }
+
+
+
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../features/auth/models/user_model.dart';
+
+
+class AuthController {
+
+  static const String _userKey="user";
+  static const String _tokenKey="token";
+
+
+  static  UserModel ? userModel;
+  static String ? Token;
+
+
+
+  static Future<void> saveDataAndToken(String token, UserModel model) async{
+
+    final SharedPreferences pref=await SharedPreferences.getInstance();
+
+    await pref.setString(_userKey, jsonEncode(model.toJson())); // jsonEncode takes map/list convert it to jsonString
+    await pref.setString(_tokenKey, token);
+
+
+    userModel=model;
+    Token=token;
+
+
+  }
+
+
+
+  static Future<void> updateData(UserModel model) async{
+
+    final  SharedPreferences pref=await SharedPreferences.getInstance();
+
+    await pref.setString(_userKey,jsonEncode(model.toJson()) );
+
+    userModel=model;
+  }
+
+
+  static Future<void> getUserData()  async{
+
+    final SharedPreferences pref= await SharedPreferences.getInstance();
+
+    String ? token=pref.getString(_tokenKey);
+
+    String ? jsonString=pref.getString(_userKey);
+
+    userModel= UserModel.fromJson(jsonDecode(jsonString!));
+    Token=token;
+
+
+
+  }
+
+
+
+  static Future<bool> isLogedIn() async{
+
+    final SharedPreferences pref= await SharedPreferences.getInstance();
+
+    String ? token= pref.getString(_tokenKey);
+
+    if(token!=null ){
+      await getUserData();
+      return true;
+    }else{
+      return false;
+    }
+
+  }
+
+
+  static Future<void> clearData() async{
+
+    final SharedPreferences pref=await SharedPreferences.getInstance();
+    await pref.clear();
+
+    userModel=null;
+    Token=null;
+
+  }
+
+
+
+
+}

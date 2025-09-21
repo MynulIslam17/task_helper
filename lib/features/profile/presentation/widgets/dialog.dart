@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 class LogoutDialog extends StatefulWidget {
   final String text;
-  const LogoutDialog({super.key, required this.text});
+  final VoidCallback onTap;
+
+  const LogoutDialog({super.key, required this.text,
+    required this.onTap});
 
   @override
   State<LogoutDialog> createState() => _LogoutDialogState();
@@ -69,10 +72,7 @@ class _LogoutDialogState extends State<LogoutDialog> {
                 // Confirm button
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Perform logout action here
-                      // e.g., Navigator.of(context).pop();
-                    },
+                    onPressed: widget.onTap,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF6A994E),
                       padding: const EdgeInsets.symmetric(vertical: 12.0),

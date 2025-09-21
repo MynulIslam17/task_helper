@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_helper/app/images_path.dart';
+import 'package:task_helper/core/services/api_services.dart';
+import 'package:task_helper/core/utils/urls/api_urls.dart';
+import 'package:task_helper/features/home/controller/all_task_controller.dart';
+import 'package:task_helper/features/home/model/task_model.dart';
 import 'package:task_helper/features/home/presentation/screens/widgets/task_card.dart';
 import 'package:task_helper/features/task/presentation/screens/edit_task_screen.dart';
 import 'package:task_helper/features/task/presentation/screens/task_details_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  static const String name="home_screen";
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+
+
+
+  final allTaskController=Get.find<AllTaskController>(); ///  GETX controller
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+/// call get all task
+    _getAllTask();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,26 +94,55 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Task list
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 20,
-                itemBuilder: (context, index) {
-                  return TaskCard(
-                    onTap: (){
+              GetBuilder<AllTaskController>(
+                builder: (controller) {
+                  if (controller.taskList.isEmpty) {
+                    return const Center(child: Text("No tasks found."));
+                  }
 
-                      Navigator.pushNamed(context, TaskDetailsScreen.name);
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: controller.taskList.length,
+                    itemBuilder: (context, index) {
+                      final task = controller.taskList[index];
+
+                      return TaskCard(
+                        onTap: () {
+                          Navigator.pushNamed(context, TaskDetailsScreen.name);
+                        },
+                        title: "Task $index: ${task.title}",
+                        description: task.description,
+                      );
                     },
-                    title: "Task $index: Design Landing Page Header",
-                    description:
-                    "Create a clean, responsive header with logo, nav links, and a call-to-action button.",
                   );
                 },
               ),
+
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _getAllTask() async{
+
+
+    bool success=await allTaskController.retrieveTask();
+    if(!mounted){
+      return;
+    }
+
+    if(!success){
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(allTaskController.errorMessage!)));
+
+    }
+
+
+
+
+
   }
 }
