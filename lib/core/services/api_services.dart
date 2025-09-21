@@ -229,6 +229,74 @@ class NetworkCaller {
 
 
 
+  /// PATCH multipart request (update profile)
+  static Future<NetworkResponse> updateProfile({
+    required String url,
+    required Map<String, String> fields,
+    File? profileImage,
+  }) async {
+    try {
+      final uri = Uri.parse(url);
+      var request = http.MultipartRequest("PATCH", uri);
+
+      // Add headers
+      request.headers.addAll({
+        "token": AuthController.Token ?? "",
+      });
+
+      // Add text fields
+      request.fields.addAll(fields);
+
+      // Add profile image if exists
+      if (profileImage != null) {
+        String extension = profileImage.path.split('.').last.toLowerCase();
+        String mimeType = extension == "png" ? "png" : "jpeg";
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            "profile_picture", // backend key
+            profileImage.path,
+            contentType: MediaType("image", mimeType),
+          ),
+        );
+      }
+
+      // Send request
+      var response = await request.send();
+      var responseData = await http.Response.fromStream(response);
+
+      // Parse response
+      if (responseData.statusCode == 200) {
+        final decodedJson = jsonDecode(responseData.body);
+        return NetworkResponse(
+          statusCode: responseData.statusCode,
+          success: true,
+          body: decodedJson,
+        );
+      } else if (responseData.statusCode == 401) {
+        return NetworkResponse(
+          statusCode: responseData.statusCode,
+          success: false,
+          errorMsg: unAuthorizedError,
+        );
+      } else {
+        final decodedJson = jsonDecode(responseData.body);
+        return NetworkResponse(
+          statusCode: responseData.statusCode,
+          success: false,
+          errorMsg: decodedJson["message"] ?? errorMessage,
+        );
+      }
+    } catch (e) {
+      return NetworkResponse(
+        statusCode: -1,
+        success: false,
+        errorMsg: e.toString(),
+      );
+    }
+  }
+
+
 
 
   static void _logRequest(
